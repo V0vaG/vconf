@@ -3,13 +3,23 @@ import os
 import json
 from datetime import datetime
 
+
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
 # Directory for storing configuration and data
-FILES_PATH = os.path.expanduser("~/script_files")
-DATA_DIR = f"/home/{os.environ.get('USER')}/my_scripts/vconf"
+# Directory for storing configuration and data in the same directory as the script
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Set FILES_PATH and DATA_DIR in the same directory as the Python script
+DATA_DIR = os.path.join(SCRIPT_DIR, "data")
+
+# Ensure the directories exist
 os.makedirs(DATA_DIR, exist_ok=True)
+
+print(f"Data directory: {DATA_DIR}")
+
+print(DATA_DIR)
 
 
 # Helper function to generate topic ID

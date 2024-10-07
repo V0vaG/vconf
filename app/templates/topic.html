@@ -2,17 +2,117 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Topic Details</title>
+    <style>
+        /* General reset and layout */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Container styling */
+        .container {
+            background-color: white;
+            padding: 30px 50px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            text-align: left;
+            width: 100%;
+            max-width: 600px;
+        }
+
+        /* Heading style */
+        h1 {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Paragraph and preformatted text styling */
+        p {
+            font-size: 1rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        pre {
+            background-color: #f4f4f4;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: monospace;
+            font-size: 1rem;
+        }
+
+        /* Button styling */
+        .button {
+            padding: 12px 25px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin-top: 20px;
+            margin-right: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .button:active {
+            background-color: #3e8e41;
+            transform: translateY(0);
+        }
+
+        /* Cancel button styling */
+        .cancel-button {
+            background-color: #f44336;
+        }
+
+        .cancel-button:hover {
+            background-color: #e53935;
+            transform: translateY(-2px);
+        }
+
+        .cancel-button:active {
+            background-color: #d32f2f;
+            transform: translateY(0);
+        }
+
+        /* Button container for layout */
+        .button-container {
+            display: flex;
+            justify-content: flex-start;
+        }
+    </style>
 </head>
 <body>
-    <h1>Topic: {{ topic.topic }}</h1>
-    <p><strong>ID:</strong> {{ topic.topic_id }}</p>
-    <p><strong>Creation Date:</strong> {{ topic.creation_date }}</p>
-    <p><strong>Edition Date:</strong> {{ topic.edition_date }}</p>
-    <p><strong>Data:</strong></p>
-    <pre>{{ topic.data }}</pre>
-    <a href="{{ url_for('list_topics') }}">Back to List</a>
-    <a href="{{ url_for('edit_topic', file=file, id=topic.topic_id) }}">Edit</a>
+    <div class="container">
+        <h1>Topic: {{ topic.topic }}</h1>
+        <p><strong>ID:</strong> {{ topic.topic_id }}</p>
+        <p><strong>Creation Date:</strong> {{ topic.creation_date }}</p>
+        <p><strong>Edition Date:</strong> {{ topic.edition_date }}</p>
+        <p><strong>Data:</strong></p>
+        <pre>{{ topic.data }}</pre>
+
+        <div class="button-container">
+            <a href="{{ url_for('list_topics') }}" class="button cancel-button">Back to List</a>
+            <a href="{{ url_for('edit_topic', file=file, id=topic.topic_id) }}" class="button">Edit</a>
+        </div>
+    </div>
 </body>
 </html>
-
