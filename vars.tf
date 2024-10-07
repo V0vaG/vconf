@@ -1,5 +1,5 @@
 variable "name_prefix" {
-  default = "weather_" 
+  default = "vconf_" 
 }
 
 variable "region" {
@@ -15,7 +15,7 @@ variable "my_instance_type" {
 }
 
 variable "key_name" {
-  default = "ec2_key"
+  default = "ec2_s_key"
 }
 
 variable "ingress_ports" {
