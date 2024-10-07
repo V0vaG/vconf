@@ -47,6 +47,8 @@ jobs:
     - name: push latest
       run: docker push vova0911/vconf:latest
     
+      
+
   # deloy_to_ec2:
   #   needs: push_to_docker_hub
   #   runs-on: ubuntu-latest
