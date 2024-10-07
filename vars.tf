@@ -15,7 +15,7 @@ variable "my_instance_type" {
 }
 
 variable "key_name" {
-  default = "ec2_s_key"
+  default = "vova_key"
 }
 
 variable "ingress_ports" {
