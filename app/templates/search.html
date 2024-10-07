@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search Topics</title>
+</head>
+<body>
+    <h1>Search Topics</h1>
+    <form action="{{ url_for('search_topic') }}" method="POST">
+        <label for="search_term">Search Term:</label>
+        <input type="text" id="search_term" name="search_term" required><br>
+        <button type="submit">Search</button>
+    </form>
+    <a href="{{ url_for('home') }}">Back to Home</a>
+</body>
+</html>
+
