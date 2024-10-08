@@ -4,6 +4,10 @@ import json
 from datetime import datetime
 import socket
 
+build_num = os.getenv('B_NUM')
+
+if not build_num:
+    build_num = '0.0.0'
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -44,7 +48,7 @@ def generate_topic_id():
 # Route for home page
 @app.route('/')
 def home():
-    return render_template('index.html', host = socket.gethostname())
+    return render_template('index.html', host = socket.gethostname(), version = build_num)
 
 
 # Route to list all topics (with clickable links)

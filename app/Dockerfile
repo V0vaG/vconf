@@ -1,5 +1,8 @@
 FROM python:3.9-slim
 
+ARG VERSION
+ENV B_NUM=$VERSION
+
 WORKDIR ~/
 
 COPY ./requirements.txt .

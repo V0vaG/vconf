@@ -71,7 +71,7 @@
 <body>
     <div class="container">
         <h1>Welcome to the Topic Manager1</h1>
-        <h2 ID="host" style="color:green;">Host: {{ host }}</h2>
+        <h2 ID="host" style="color:green;">Host: {{ host }}, ver: {{ version }}</h2>
         <ul>
             <li><a href="{{ url_for('list_topics') }}" class="button">List All Topics</a></li>
             <li><a href="{{ url_for('create_topic') }}" class="button">Create a New Topic</a></li>
