@@ -17,7 +17,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: run image
-      run: docker compose up -d --build --scale app=4
+      run: docker compose up -d --build --scale app=${{ env.POD_NUM }}
       
     - name: test app
       run: bash site_test.sh
@@ -29,7 +29,7 @@ jobs:
     - uses: actions/checkout@v3
     
     - name: Build the Docker image
-      run: docker build VERSION=${{ env.VERSION }}  -t vova0911/vconf:latest ./app
+      run: docker build --build-arg VERSION=${{ env.VERSION }}  -t vova0911/vconf:latest ./app
       # run: docker build -t vova0911/vconf:latest ./app
     
     - name: Login to Docker Hub
