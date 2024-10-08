@@ -4,6 +4,8 @@ import json
 from datetime import datetime
 import socket
 
+from werkzeug.utils import secure_filename
+
 build_num = os.getenv('B_NUM')
 host = socket.gethostname()
 
@@ -16,6 +18,10 @@ app.secret_key = 'supersecretkey'
 # Directory for storing configuration and data
 # Directory for storing configuration and data in the same directory as the script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Directory for storing uploaded files
+FILES_DIR = os.path.join(SCRIPT_DIR, 'static', 'files')
+os.makedirs(FILES_DIR, exist_ok=True)
 
 # Set FILES_PATH and DATA_DIR in the same directory as the Python script
 DATA_DIR = os.path.join(SCRIPT_DIR, "data")
@@ -82,7 +88,9 @@ def show_topic(file, id):
             data = json.load(f)
             for topic in data:
                 if topic["topic_id"] == id:
-                    return render_template('topic.html', topic=topic, file=file)
+                    topic_files_dir = os.path.join(FILES_DIR, id)
+                    files = os.listdir(topic_files_dir) if os.path.exists(topic_files_dir) else []
+                    return render_template('topic.html', topic=topic, file=file, files=files)
 
     flash(f"Topic with ID {id} not found.", "danger")
     return redirect(url_for('list_topics'))
@@ -92,11 +100,20 @@ def show_topic(file, id):
 @app.route('/topic/<file>/<id>/edit', methods=['GET', 'POST'])
 def edit_topic(file, id):
     file_path = os.path.join(DATA_DIR, file)
+    topic_files_dir = os.path.join(FILES_DIR, id)  # Directory for this topic's files
+    os.makedirs(topic_files_dir, exist_ok=True)
 
     if request.method == 'POST':
         updated_topic = request.form.get('topic')
         updated_data = request.form.get('data')
         edition_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Store the edition date
+
+        # Handle file uploads
+        uploaded_files = request.files.getlist('files')
+        for uploaded_file in uploaded_files:
+            if uploaded_file.filename:
+                filename = secure_filename(uploaded_file.filename)
+                uploaded_file.save(os.path.join(topic_files_dir, filename))
 
         # Update the topic in the JSON file
         if os.path.exists(file_path):
@@ -112,7 +129,7 @@ def edit_topic(file, id):
             with open(file_path, 'w') as f:
                 json.dump(data, f, indent=4)
 
-            flash(f"Topic with ID {id} has been updated.", "success")
+            flash(f"Topic with ID {id} has been updated. Files uploaded successfully.", "success")
             return redirect(url_for('show_topic', file=file, id=id))
 
     # Preload the topic for the GET request
@@ -121,7 +138,9 @@ def edit_topic(file, id):
             data = json.load(f)
             for topic in data:
                 if topic["topic_id"] == id:
-                    return render_template('edit.html', topic=topic, file=file)
+                    # List all files uploaded for this topic
+                    files = os.listdir(topic_files_dir)
+                    return render_template('edit.html', topic=topic, file=file, files=files)
 
     flash(f"Topic with ID {id} not found.", "danger")
     return redirect(url_for('list_topics'))
@@ -210,6 +229,16 @@ def delete_topic(file, id):
         flash(f"File not found: {file}", "danger")
 
     return redirect(url_for('list_topics'))
+
+@app.route('/delete_file/<topic_id>/<filename>', methods=['POST'])
+def delete_file(topic_id, filename):
+    file_path = os.path.join(FILES_DIR, topic_id, filename)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        flash(f"File '{filename}' has been deleted.", "success")
+    else:
+        flash(f"File '{filename}' not found.", "danger")
+    return redirect(url_for('edit_topic', file='data.json', id=topic_id))  # Adjust based on your data file
 
 
 if __name__ == '__main__':

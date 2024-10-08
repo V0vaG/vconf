@@ -40,6 +40,7 @@ services:
             - /home/ubuntu/json/:/~/json
             - /home/ubuntu/logs/:/~/logs
             - /home/ubuntu/data/:/~/data
+            - /home/ubuntu/static/:/~/static
     nginx:
         container_name: nginx
         restart: always

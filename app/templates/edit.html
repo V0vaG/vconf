@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Topic</title>
     <style>
-        /* General reset and layout */
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f0f4f8;
@@ -17,7 +16,6 @@
             margin: 0;
         }
 
-        /* Container styling */
         .container {
             background-color: white;
             padding: 30px 50px;
@@ -28,31 +26,26 @@
             max-width: 600px;
         }
 
-        /* Heading style */
         h1 {
             font-size: 2rem;
             color: #333;
             margin-bottom: 30px;
-            text-align: left;
         }
 
-        /* Form input styling */
         input[type="text"], textarea {
-            width: 100%;
+            width: 100%; 
             padding: 12px;
             margin: 10px 0;
             border: 2px solid #ddd;
             border-radius: 5px;
             box-sizing: border-box;
             font-size: 1rem;
-            text-align: left;
         }
 
-        input[type="text"]:focus, textarea:focus {
-            border-color: #4CAF50;
+        input[type="file"] {
+            margin: 10px 0;
         }
 
-        /* Button styling */
         .button {
             padding: 12px 25px;
             background-color: #4CAF50;
@@ -71,14 +64,7 @@
             transform: translateY(-2px);
         }
 
-        .button:active {
-            background-color: #3e8e41;
-            transform: translateY(0);
-        }
-
-        /* Cancel link styled like a button */
         .cancel-button {
-            display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
             background-color: #f44336;
@@ -95,50 +81,37 @@
             background-color: #e53935;
             transform: translateY(-2px);
         }
-
-        .cancel-button:active {
-            background-color: #d32f2f;
-            transform: translateY(0);
-        }
     </style>
-
-    <!-- Include CodeMirror CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
-    <!-- Include CodeMirror theme (optional, changeable) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/idea.min.css">
-
-    <!-- Include CodeMirror JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
-    <!-- Include CodeMirror mode for Markdown -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/markdown/markdown.min.js"></script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Initialize CodeMirror on the 'textarea'
-            var editor = CodeMirror.fromTextArea(document.getElementById('data'), {
-                mode: 'markdown',  // Set the mode for syntax highlighting (Markdown)
-                lineNumbers: true, // Optional: Display line numbers
-                theme: 'idea',     // Optional: Set a theme, you can choose others from CodeMirror's themes
-                tabSize: 4,
-                indentWithTabs: true,
-                lineWrapping: true  // Optional: Wrap long lines
-            });
-        });
-    </script>
 </head>
 <body>
     <div class="container">
-        <h1>Edit Topic: {{ topic.topic }}</h1>
-        <form action="{{ url_for('edit_topic', file=file, id=topic.topic_id) }}" method="POST">
+        <h1>Edit Topic</h1>
+        <form id="edit-topic-form" action="{{ url_for('edit_topic', file=file, id=topic['topic_id']) }}" method="POST" enctype="multipart/form-data">
             <label for="topic">Topic Name:</label>
-            <input type="text" id="topic" name="topic" value="{{ topic.topic }}" required><br>
+            <input type="text" id="topic" name="topic" value="{{ topic['topic'] }}" required><br>
 
-            <label for="data">Data:</label>
-            <textarea id="data" name="data" required>{{ topic.data }}</textarea><br>
+            <label for="data">Topic Data:</label>
+            <textarea id="data" name="data" rows="10" required>{{ topic['data'] }}</textarea><br>
+
+            <label for="files">Upload Files:</label>
+            <input type="file" id="files" name="files" multiple><br><br>
 
             <button type="submit" class="button">Save Changes</button>
         </form>
-        <a href="{{ url_for('show_topic', file=file, id=topic.topic_id) }}" class="cancel-button">Cancel</a>
+
+        <h3>Uploaded Files:</h3>
+        <ul>
+            {% for file in files %}
+                <li>
+                    <a href="{{ url_for('static', filename='files/' + topic['topic_id'] + '/' + file) }}">{{ file }}</a>
+                    <form action="{{ url_for('delete_file', topic_id=topic['topic_id'], filename=file) }}" method="POST" style="display:inline;">
+                        <button type="submit" class="button" style="background-color: #f44336;">Delete</button>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <a href="{{ url_for('list_topics') }}" class="cancel-button">Cancel</a>
     </div>
 </body>
 </html>

@@ -98,6 +98,25 @@
             display: flex;
             justify-content: flex-start;
         }
+
+        /* Styling for the file list */
+        ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        a.file-link {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        a.file-link:hover {
+            text-decoration: underline;
+        }
     </style>
 
     <!-- Highlight.js CSS -->
@@ -122,6 +141,15 @@
         <p><strong>Edition Date:</strong> {{ topic.edition_date }}</p>
         <p><strong>Data:</strong></p>
         <pre><code>{{ topic.data }}</code></pre>
+
+        <h3>Uploaded Files:</h3>
+        <ul>
+            {% for file in files %}
+                <li>
+                    <a href="{{ url_for('static', filename='files/' + topic.topic_id + '/' + file) }}" class="file-link">{{ file }}</a>
+                </li>
+            {% endfor %}
+        </ul>
 
         <div class="button-container">
             <a href="{{ url_for('list_topics') }}" class="button cancel-button">Back to List</a>
