@@ -1,8 +1,7 @@
 name: stop_vconf
 
 on:
-  push:
-    branches: [ "main1" ]
+    workflow_dispatch:  # Add this line to enable manual triggering
     
 jobs:    
   terraform_destroy:      
