@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: test app
+    - name: Print version
       run: echo "running version ${{ env.VERSION }}"
 
     - name: run image
