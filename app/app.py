@@ -15,7 +15,6 @@ if not build_num:
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# Directory for storing configuration and data
 # Directory for storing configuration and data in the same directory as the script
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -156,26 +155,24 @@ def create_topic():
 
         full_path = os.path.join(DATA_DIR, f"{file_name}.json")
 
-        # Initialize the file if it doesn't exist
         if not os.path.exists(full_path):
             with open(full_path, 'w') as f:
                 json.dump([], f)
 
-        # Generate unique topic ID
         topic_id = generate_topic_id()
-
-        # Append new topic to the JSON file
         creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
         new_entry = {
             "topic_id": topic_id,
             "creation_date": creation_date,
-            "edition_date": "Never Edited",  # Default value for newly created topics
+            "edition_date": "Never Edited",
             "topic": new_topic,
             "data": new_data
         }
 
         with open(full_path, 'r') as f:
             data = json.load(f)
+
         data.append(new_entry)
         with open(full_path, 'w') as f:
             json.dump(data, f, indent=4)
@@ -184,6 +181,7 @@ def create_topic():
         return redirect(url_for('list_topics'))
 
     return render_template('create.html')
+
 
 # Route to search and edit a topic
 @app.route('/search', methods=['GET', 'POST'])

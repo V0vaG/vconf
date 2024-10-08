@@ -5,48 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Topic</title>
     <style>
+        /* Global Styles */
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f0f4f8;
             display: flex;
-            flex-direction: column;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             height: 100vh;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
+        /* Main Container */
         .container {
             background-color: white;
             padding: 30px 50px;
             border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             text-align: left;
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 90vh; /* Make the container fill most of the viewport height */
         }
 
+        /* Header */
         h1 {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: #333;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
         }
 
+        /* Input and Textarea Styles */
         input[type="text"], textarea {
             width: 100%; 
-            padding: 12px;
-            margin: 10px 0;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            box-sizing: border-box;
+            padding: 15px;
+            margin: 10px 0 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             font-size: 1rem;
+            background-color: #f9f9f9;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
 
-        input[type="file"] {
-            margin: 10px 0;
+        input[type="text"]:focus, textarea:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+            outline: none;
         }
 
-        .button {
+        textarea {
+            font-family: 'Courier New', Courier, monospace;
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        /* Button Styles */
+        .button, .upload-button {
             padding: 12px 25px;
             background-color: #4CAF50;
             color: white;
@@ -55,24 +77,23 @@
             font-size: 1.1rem;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-right: 10px;
         }
 
-        .button:hover {
+        .button:hover, .upload-button:hover {
             background-color: #45a049;
             transform: translateY(-2px);
         }
 
+        /* Cancel Button */
         .cancel-button {
-            margin-top: 20px;
-            padding: 10px 20px;
+            padding: 12px 25px;
             background-color: #f44336;
             color: white;
             border: none;
             border-radius: 30px;
             font-size: 1.1rem;
-            text-decoration: none;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
         }
@@ -81,6 +102,76 @@
             background-color: #e53935;
             transform: translateY(-2px);
         }
+
+        /* Button Group - Save, Cancel, and Upload Buttons Side by Side */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        /* Hidden File Input */
+        .custom-upload-button {
+            display: none;
+        }
+
+        /* File List Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        table th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        .delete-file-button {
+            padding: 6px 10px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-file-button:hover {
+            background-color: #e53935;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            input[type="text"], textarea {
+                font-size: 0.9rem;
+            }
+
+            .button, .cancel-button {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
+
+            .delete-file-button {
+                font-size: 0.8rem;
+            }
+        }
+
     </style>
 </head>
 <body>
@@ -88,30 +179,52 @@
         <h1>Edit Topic</h1>
         <form id="edit-topic-form" action="{{ url_for('edit_topic', file=file, id=topic['topic_id']) }}" method="POST" enctype="multipart/form-data">
             <label for="topic">Topic Name:</label>
-            <input type="text" id="topic" name="topic" value="{{ topic['topic'] }}" required><br>
+            <input type="text" id="topic" name="topic" value="{{ topic['topic'] }}" required>
 
-            <label for="data">Topic Data:</label>
-            <textarea id="data" name="data" rows="10" required>{{ topic['data'] }}</textarea><br>
+            <label for="data">Topic Data (Markdown):</label>
+            <textarea id="data" name="data" required>{{ topic['data'] }}</textarea>
 
-            <label for="files">Upload Files:</label>
-            <input type="file" id="files" name="files" multiple><br><br>
-
-            <button type="submit" class="button">Save Changes</button>
+            <!-- Save, Cancel, and Upload Buttons -->
+            <div class="button-group">
+                <button type="submit" class="button">Save Changes</button>
+                <a href="{{ url_for('list_topics') }}" class="cancel-button">Cancel</a>
+                <label id="upload-label" for="files" class="upload-button">Upload Files</label>
+            </div>
+            <input type="file" id="files" name="files" class="custom-upload-button" multiple>
         </form>
 
-        <h3>Uploaded Files:</h3>
-        <ul>
-            {% for file in files %}
-                <li>
-                    <a href="{{ url_for('static', filename='files/' + topic['topic_id'] + '/' + file) }}">{{ file }}</a>
-                    <form action="{{ url_for('delete_file', topic_id=topic['topic_id'], filename=file) }}" method="POST" style="display:inline;">
-                        <button type="submit" class="button" style="background-color: #f44336;">Delete</button>
-                    </form>
-                </li>
-            {% endfor %}
-        </ul>
-
-        <a href="{{ url_for('list_topics') }}" class="cancel-button">Cancel</a>
+        <!-- Conditionally show the uploaded files table only if there are files -->
+        {% if files %}
+        <table>
+            <thead>
+                <tr>
+                    <th>File Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in files %}
+                <tr>
+                    <td>
+                        <a href="{{ url_for('static', filename='files/' + topic['topic_id'] + '/' + file) }}">{{ file }}</a>
+                    </td>
+                    <td>
+                        <form action="{{ url_for('delete_file', topic_id=topic['topic_id'], filename=file) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="delete-file-button">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
     </div>
+
+    <script>
+        // Trigger file input when the custom upload button is clicked
+        document.getElementById('upload-label').addEventListener('click', function() {
+            document.getElementById('files').click();
+        });
+    </script>
 </body>
 </html>

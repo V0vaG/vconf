@@ -1,51 +1,16 @@
 [
     {
         "topic_id": "00001",
-        "creation_date": "2024-10-07 08:49:25",
-        "edition_date": "2024-10-08 23:15:09",
-        "topic": "123",
-        "data": "abc123\r\na\r\n@@ vova"
+        "creation_date": "2024-10-09 00:52:54",
+        "edition_date": "2024-10-09 00:53:30",
+        "topic": "azure devops create windows service",
+        "data": "- task: PowerShell@2\r\n  displayName: 'Create service'\r\n  inputs:\r\n    targetType: 'inline'\r\n    script: |\r\n      $serviceName = \"ServiceName\"\r\n      $executablePath = \"path\\to\\script_folder\\script.bat\"\r\n      $destinationPath = \"path\\to\\script_folder\\WinSW-x86.exe\"\r\n      $(WinSW_url) = 'https://github.com/winsw/winsw/releases/download/v2.12.0/WinSW-x86.exe'\r\n      $token = '****************************'\r\n      $headers = @{\r\n        Authorization = \"Bearer $token\"\r\n      }\r\n\r\n      Invoke-WebRequest -Uri $(WinSW_url) -Headers $headers -OutFile $destinationPath\r\n\r\n      echo \"<service>\r\n      <id>$serviceName</id>\r\n      <name>$serviceName</name>\r\n      <description>This service will run on windows system.</description>\r\n      <executable>$executablePath</executable>\r\n      </service>\" > \"path\\to\\script_folder\\WinSW-x86.xml\"\r\n\r\n      # Check if the service exists\r\n      $service = Get-Service -Name $serviceName -ErrorAction SilentlyContinue\r\n\r\n      if ($service) {\r\n          Write-Output \"Service '$serviceName' exists.\"\r\n          # Add your action here if the service exists\r\n      } else {\r\n          Write-Output \"Service '$serviceName' does not exist, creating...\"\r\n          path\\to\\script_folder\\WinSW-x86.exe install WinSW-x86.xml\r\n      }\r\n\r\n- task: PowerShell@2\r\n  displayName: 'Start service'\r\n  inputs:\r\n    targetType: 'inline'\r\n    script: |\r\n      $(WinSW_dest) start WinSW-x86.xml\r\n      $(WinSW_dest) status WinSW-x86.xml\r\n\r\n- task: PowerShell@2\r\n  displayName: 'Kill processes'\r\n  inputs:\r\n    targetType: 'inline'\r\n    script: |\r\n      $filePaths = @(\"path\\to\\script_folder\\script.bat\")\r\n\r\n      foreach ($filePath in $filePaths) {\r\n          # Get the process associated with the file path\r\n          $process = Get-Process | Where-Object { $_.Path -eq $filePath } -ErrorAction SilentlyContinue\r\n          if ($process) {\r\n              # Kill the process if it is running\r\n              Stop-Process -Id $process.Id -Force\r\n              Write-Output \"Process with path '$filePath' has been terminated.\"\r\n          } else {\r\n              Write-Output \"No process found with path '$filePath'.\"\r\n          }\r\n      }\r\n\r\n"
     },
     {
         "topic_id": "00002",
-        "creation_date": "2024-10-08 12:18:49",
+        "creation_date": "2024-10-09 00:54:58",
         "edition_date": "Never Edited",
-        "topic": "aaa",
-        "data": "bbb"
-    },
-    {
-        "topic_id": "00004",
-        "creation_date": "2024-10-08 16:32:05",
-        "edition_date": "2024-10-08 18:13:01",
-        "topic": "1233",
-        "data": "12"
-    },
-    {
-        "topic_id": "00005",
-        "creation_date": "2024-10-08 20:39:03",
-        "edition_date": "2024-10-08 20:39:20",
-        "topic": "aa",
-        "data": "aa"
-    },
-    {
-        "topic_id": "00006",
-        "creation_date": "2024-10-08 23:02:48",
-        "edition_date": "2024-10-08 23:03:07",
-        "topic": "vova",
-        "data": "abc123\r\naa"
-    },
-    {
-        "topic_id": "00007",
-        "creation_date": "2024-10-08 23:15:25",
-        "edition_date": "2024-10-08 23:15:32",
-        "topic": "vvo",
-        "data": "aaaa"
-    },
-    {
-        "topic_id": "00008",
-        "creation_date": "2024-10-08 23:49:01",
-        "edition_date": "2024-10-08 23:49:25",
-        "topic": "abc python",
-        "data": "vova"
+        "topic": "azure devops global var",
+        "data": "stages:\r\n  - stage: get_var_from_json\r\n    displayName: get_var_from_json\r\n    jobs:\r\n    - job: 'get_var'\r\n      displayName: print system version\r\n      workspace:\r\n        clean: all\r\n      pool:\r\n        name: <agent_pool_name>\r\n      steps:\r\n      - powershell: |\r\n          $master_version = (Get-Content version.json | ConvertFrom-Json).master_version\r\n          echo $master_version\r\n          Write-Host \"##vso[task.setvariable variable=master_version;isoutput=true]$master_version\"\r\n        name: my_var\r\n\r\n\r\n  - stage: build_apps\r\n    dependsOn: get_var_from_json\r\n    variables:\r\n      master_version: $[ stageDependencies.get_var_from_json.get_var.outputs['my_var.master_version'] ]\r\n\r\n    - job: backend_build\r\n      variables:\r\n        - name: master_version\r\n      displayName: Build Backend\r\n      workspace:\r\n        clean: all\r\n      pool:\r\n        name: <agent_pool_name>\r\n      steps:\r\n      - powershell: |\r\n            echo $(master_version)\r\n\r\n-----------------version.json-----------------------\r\n{\r\n    \"master_version\":  \"1.0.61\"\r\n}\r\n\r\n\r\n_______________________________________________________\r\nstages:\r\n  - stage: stage_a\r\n    displayName: satge_a\r\n    jobs:\r\n    - job: 'gev_var_from_json'\r\n      displayName: Print system version\r\n      workspace:\r\n        clean: all\r\n      pool:\r\n        name: USER\r\n      steps:\r\n      - powershell: |\r\n          $m_version = 'abc'\r\n          echo \"1_var- $m_version\"\r\n          Write-Host \"##vso[task.setvariable variable=master_version;isoutput=true]$m_version\"\r\n        name: system_version_global\r\n\r\n  - stage: stage_b\r\n    displayName: satge_b\r\n    dependsOn: stage_a\r\n    jobs:\r\n    - job: print_var\r\n      workspace:\r\n        clean: all\r\n      pool:\r\n        name: USER\r\n      variables:\r\n        master_version: $[ stageDependencies.stage_a.gev_var_from_json.outputs['system_version_global.master_version'] ]\r\n      steps:\r\n      - powershell: |\r\n          echo $(master_version)\r\n          Write-Host \"##vso[task.setvariable variable=master_version;isoutput=true]$(master_version)\"\r\n        name: my_var\r\n\r\n  - stage: stage_c\r\n    displayName: satge_c\r\n    dependsOn: stage_b\r\n    variables:\r\n      master_version: $[ stageDependencies.stage_b.print_var.outputs['my_var.master_version'] ]\r\n    jobs:\r\n    - job: print_var\r\n      variables:\r\n        - name: master_version\r\n      workspace:\r\n        clean: all\r\n      pool:\r\n        name: USER\r\n\r\n      steps:\r\n      - powershell: echo $(master_version)\r\n        displayName: Print var $(master_version)\r\n\r\n"
     }
 ]
