@@ -47,8 +47,6 @@ jobs:
     - name: push latest
       run: docker push vova0911/vconf:latest
     
-
-
   deloy_to_ec2:
     needs: push_to_docker_hub
     runs-on: ubuntu-latest
@@ -73,8 +71,8 @@ jobs:
     - name: terraform init
       run: terraform init
 
-    - name: terraform destroy
-      run: terraform destroy -auto-approve
+    # - name: terraform destroy
+    #   run: terraform destroy -auto-approve
       
-    # - name: terraform apply
-    #   run: terraform apply -auto-approve
+    - name: terraform apply
+      run: terraform apply -auto-approve
