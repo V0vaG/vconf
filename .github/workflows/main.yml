@@ -7,9 +7,7 @@ on:
 env:
   VERSION: 'git_hub_1.1.${{ github.run_number }}'
   POD_NUM: '4'
-  COLOR:   'pink'
-  ACTION: 'deploy'
-  
+
 jobs:    
   build_and_test:
     runs-on: ubuntu-latest
