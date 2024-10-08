@@ -25,6 +25,9 @@ sudo rm /home/ubuntu/run.sh
 sudo rm /home/ubuntu/admin.conf
 sudo rm /home/ubuntu/solitare.yaml
 
+# sudo rm /home/ubuntu/docker-compose.yml
+# cd /home/ubuntu && docker-compose down
+
 sudo cat << EOF > /home/ubuntu/docker-compose.yml
 version: "3"
 
