@@ -8,6 +8,7 @@ services:
         volumes:
             - /home/ubuntu/json/:/~/json
             - /home/ubuntu/logs/:/~/logs
+            - /home/ubuntu/data/:/~/data
     nginx:
         container_name: nginx
         restart: always
