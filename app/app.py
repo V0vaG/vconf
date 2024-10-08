@@ -5,6 +5,7 @@ from datetime import datetime
 import socket
 
 build_num = os.getenv('B_NUM')
+host = socket.gethostname()
 
 if not build_num:
     build_num = '0.0.0'
@@ -48,7 +49,7 @@ def generate_topic_id():
 # Route for home page
 @app.route('/')
 def home():
-    return render_template('index.html', host = socket.gethostname(), version = build_num)
+    return render_template('index.html', host = host, version = build_num)
 
 
 # Route to list all topics (with clickable links)
