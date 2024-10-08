@@ -99,6 +99,20 @@
             justify-content: flex-start;
         }
     </style>
+
+    <!-- Highlight.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/styles/default.min.css">
+
+    <!-- Highlight.js Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            // Apply syntax highlighting
+            document.querySelectorAll('pre').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="container">
@@ -107,7 +121,7 @@
         <p><strong>Creation Date:</strong> {{ topic.creation_date }}</p>
         <p><strong>Edition Date:</strong> {{ topic.edition_date }}</p>
         <p><strong>Data:</strong></p>
-        <pre>{{ topic.data }}</pre>
+        <pre><code>{{ topic.data }}</code></pre>
 
         <div class="button-container">
             <a href="{{ url_for('list_topics') }}" class="button cancel-button">Back to List</a>

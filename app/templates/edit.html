@@ -23,7 +23,7 @@
             padding: 30px 50px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            text-align: center;
+            text-align: left;
             width: 100%;
             max-width: 600px;
         }
@@ -33,6 +33,7 @@
             font-size: 2rem;
             color: #333;
             margin-bottom: 30px;
+            text-align: left;
         }
 
         /* Form input styling */
@@ -44,10 +45,7 @@
             border-radius: 5px;
             box-sizing: border-box;
             font-size: 1rem;
-        }
-
-        textarea {
-            height: 50vh; /* Adjusted height of textarea */
+            text-align: left;
         }
 
         input[type="text"]:focus, textarea:focus {
@@ -103,6 +101,30 @@
             transform: translateY(0);
         }
     </style>
+
+    <!-- Include CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
+    <!-- Include CodeMirror theme (optional, changeable) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/idea.min.css">
+
+    <!-- Include CodeMirror JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
+    <!-- Include CodeMirror mode for Markdown -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/markdown/markdown.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize CodeMirror on the 'textarea'
+            var editor = CodeMirror.fromTextArea(document.getElementById('data'), {
+                mode: 'markdown',  // Set the mode for syntax highlighting (Markdown)
+                lineNumbers: true, // Optional: Display line numbers
+                theme: 'idea',     // Optional: Set a theme, you can choose others from CodeMirror's themes
+                tabSize: 4,
+                indentWithTabs: true,
+                lineWrapping: true  // Optional: Wrap long lines
+            });
+        });
+    </script>
 </head>
 <body>
     <div class="container">
