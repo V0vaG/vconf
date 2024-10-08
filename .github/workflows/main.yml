@@ -6,7 +6,7 @@ on:
     
 env:
   VERSION: 'git_hub_1.1.${{ github.run_number }}'
-  POD_NUM: '4'
+  POD_NUM: '1'
 
 jobs:    
   build_and_test:
