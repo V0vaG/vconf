@@ -47,32 +47,32 @@ jobs:
     - name: push latest
       run: docker push vova0911/vconf:latest
     
-  # deloy_to_ec2:
-  #   needs: push_to_docker_hub
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v3
+  deloy_to_ec2:
+    needs: push_to_docker_hub
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
     
-  #   - name: run tag 
-  #     run: bash tag.sh ${{ env.VERSION }} ${{ env.POD_NUM }}
+    - name: run tag 
+      run: bash tag.sh ${{ env.VERSION }} ${{ env.POD_NUM }}
     
-  #   - name: cat run.sh
-  #     run: cat ./run.sh
+    - name: cat run.sh
+      run: cat ./run.sh
       
       
-  #   - name: Configure AWS Credentials
-  #     uses: aws-actions/configure-aws-credentials@v4
-  #     with:
-  #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #       aws-region: eu-north-1
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-north-1
         
 
-  #   - name: terraform init
-  #     run: terraform init
+    - name: terraform init
+      run: terraform init
 
-  #   - name: terraform destroy
-  #     run: terraform destroy -auto-approve
+    # - name: terraform destroy
+    #   run: terraform destroy -auto-approve
       
-  #   - name: terraform apply
-  #     run: terraform apply -auto-approve
+    - name: terraform apply
+      run: terraform apply -auto-approve
