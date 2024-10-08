@@ -1,4 +1,4 @@
-name: vconf
+name: start_vconf
 
 on:
     workflow_dispatch:  # Add this line to enable manual triggering
