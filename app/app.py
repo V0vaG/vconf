@@ -181,7 +181,7 @@ def create_topic():
         flash(f"New topic '{new_topic}' added successfully!", "success")
         return redirect(url_for('list_topics'))
 
-    return render_template('create_topic.html')
+    return render_template('create.html')
 
 # Route to search and edit a topic
 @app.route('/search', methods=['GET', 'POST'])
