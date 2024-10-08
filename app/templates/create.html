@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create New Topic</title>
     <style>
+        /* General reset and layout */
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f0f4f8;
@@ -15,6 +16,8 @@
             height: 100vh;
             margin: 0;
         }
+
+        /* Container styling */
         .container {
             background-color: white;
             padding: 30px 50px;
@@ -24,22 +27,30 @@
             width: 100%;
             max-width: 600px;
         }
+
+        /* Heading style */
         h1 {
             font-size: 2rem;
             color: #333;
             margin-bottom: 30px;
         }
+
+        /* Form input styling */
         input[type="text"], textarea {
             width: 100%; 
             padding: 12px;
             margin: 10px 0;
             border: 2px solid #ddd;
             border-radius: 5px;
+            box-sizing: border-box;
             font-size: 1rem;
         }
+
         input[type="text"]:focus, textarea:focus {
             border-color: #4CAF50;
         }
+
+        /* Button styling */
         .button {
             padding: 12px 25px;
             background-color: #4CAF50;
@@ -48,23 +59,44 @@
             border-radius: 30px;
             font-size: 1.1rem;
             cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             margin-top: 20px;
         }
+
         .button:hover {
             background-color: #45a049;
+            transform: translateY(-2px);
         }
+
+        .button:active {
+            background-color: #3e8e41;
+            transform: translateY(0);
+        }
+
+        /* Cancel link styled like a button */
         .cancel-button {
             display: inline-block;
             margin-top: 20px;
             padding: 10px 20px;
             background-color: #f44336;
             color: white;
+            border: none;
             border-radius: 30px;
+            font-size: 1.1rem;
             text-decoration: none;
             cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
+
         .cancel-button:hover {
             background-color: #e53935;
+            transform: translateY(-2px);
+        }
+
+        .cancel-button:active {
+            background-color: #d32f2f;
+            transform: translateY(0);
         }
     </style>
     <!-- Include CodeMirror CSS -->
@@ -96,7 +128,7 @@
     <script>
         document.getElementById("create-topic-form").addEventListener("submit", function(event) {
             let fileNameInput = document.getElementById("file_name");
-
+            
             // If the input is empty, set the value to 'data'
             if (!fileNameInput.value) {
                 fileNameInput.value = "data";
