@@ -23,7 +23,7 @@
             padding: 30px 50px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            text-align: left;
+            text-align: center;
             width: 100%;
             max-width: 600px;
         }
@@ -99,17 +99,6 @@
             transform: translateY(0);
         }
     </style>
-
-    <!-- Include CodeMirror CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.css">
-    <!-- Include CodeMirror theme (optional, changeable) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/theme/idea.min.css">
-
-    <!-- Include CodeMirror JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/codemirror.min.js"></script>
-    <!-- Include CodeMirror mode for Markdown -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.12/mode/markdown/markdown.min.js"></script>
-
 </head>
 <body>
     <div class="container">
@@ -137,18 +126,6 @@
             if (!fileNameInput.value) {
                 fileNameInput.value = "data";
             }
-        });
-
-        // Initialize CodeMirror for the textarea with Markdown syntax highlighting
-        document.addEventListener('DOMContentLoaded', function () {
-            var editor = CodeMirror.fromTextArea(document.getElementById('new_data'), {
-                mode: 'markdown',  // Set the mode for syntax highlighting (Markdown)
-                lineNumbers: true, // Optional: Display line numbers
-                theme: 'idea',     // Optional: Set a theme, you can choose others from CodeMirror's themes
-                tabSize: 4,
-                indentWithTabs: true,
-                lineWrapping: true  // Optional: Wrap long lines
-            });
         });
     </script>
 </body>

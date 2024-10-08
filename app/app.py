@@ -185,7 +185,6 @@ def create_topic():
 
     return render_template('create.html')
 
-
 # Route to search and edit a topic
 @app.route('/search', methods=['GET', 'POST'])
 def search_topic():
