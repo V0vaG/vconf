@@ -51,4 +51,4 @@ install_docker_and_compose
 
 cd /home/ubuntu && docker-compose up -d --build --scale app=pod_num
 
-#sudo docker run vova0911/web_app_images:latest
+#sudo docker run vova0911/vconf:latest
