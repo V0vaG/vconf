@@ -3,7 +3,7 @@ version: "3"
 services:
     app:
         restart: always
-        image: vova0911/web_app_images:latest
+        image: vova0911/vconf:latest
         command: gunicorn -w 4 -b 0.0.0.0:5000 wsgi:app
         volumes:
             - /home/ubuntu/json/:/~/json
