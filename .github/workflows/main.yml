@@ -16,6 +16,9 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
+    - name: test app
+      run: echo "running version ${{ env.VERSION }}""
+
     - name: run image
       run: docker compose up -d --build --scale app=${{ env.POD_NUM }}
       
