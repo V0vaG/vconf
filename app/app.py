@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import os
 import json
 from datetime import datetime
+import socket
 
 
 app = Flask(__name__)
@@ -43,7 +44,7 @@ def generate_topic_id():
 # Route for home page
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html', host = socket.gethostname())
 
 
 # Route to list all topics (with clickable links)
