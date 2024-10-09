@@ -9,23 +9,25 @@
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f0f4f8;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
             margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+            box-sizing: border-box;
         }
 
         /* Container styling */
         .container {
             background-color: white;
-            padding: 30px 50px;
+            padding: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            text-align: left;
-            width: 100%;
-            max-width: 600px;
+            width: 100vw; /* Full width of the browser */
+            height: 100vh; /* Full height of the browser */
+            display: flex;
+            flex-direction: column;
         }
 
         /* Heading style */
@@ -35,13 +37,16 @@
             margin-bottom: 20px;
         }
 
-        /* Paragraph and preformatted text styling */
-        p {
+        /* Labels row */
+        .labels-row {
+            display: flex;
+            justify-content: space-between;
             font-size: 1rem;
             color: #555;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
+        /* Preformatted text styling */
         pre {
             background-color: #f4f4f4;
             padding: 15px;
@@ -49,10 +54,12 @@
             overflow-x: auto;
             font-family: monospace;
             font-size: 1rem;
+            flex-grow: 1; /* Make the code block expand */
+            margin-bottom: 20px; /* Space between pre and buttons */
         }
 
         /* Button styling */
-        .button {
+        .button, .cancel-button {
             padding: 12px 25px;
             background-color: #4CAF50;
             color: white;
@@ -60,12 +67,11 @@
             border-radius: 30px;
             font-size: 1.1rem;
             cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            margin-top: 20px;
-            margin-right: 10px;
             text-decoration: none;
             display: inline-block;
+            margin-right: 10px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
 
         .button:hover {
@@ -73,12 +79,6 @@
             transform: translateY(-2px);
         }
 
-        .button:active {
-            background-color: #3e8e41;
-            transform: translateY(0);
-        }
-
-        /* Cancel button styling */
         .cancel-button {
             background-color: #f44336;
         }
@@ -88,21 +88,19 @@
             transform: translateY(-2px);
         }
 
-        .cancel-button:active {
-            background-color: #d32f2f;
-            transform: translateY(0);
-        }
-
         /* Button container for layout */
         .button-container {
             display: flex;
             justify-content: flex-start;
+            flex-shrink: 0; /* Ensure button container stays at the bottom */
+            padding: 10px 0;
         }
 
         /* Styling for the file list */
         ul {
             list-style-type: none;
             padding-left: 0;
+            margin: 20px 0; /* Space between the file list and other elements */
         }
 
         li {
@@ -116,6 +114,32 @@
 
         a.file-link:hover {
             text-decoration: underline;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .labels-row {
+                flex-direction: column;
+                align-items: flex-start;
+                font-size: 0.9rem;
+            }
+
+            pre {
+                font-size: 0.9rem;
+            }
+
+            .button, .cancel-button {
+                font-size: 1rem;
+                padding: 10px 20px;
+            }
         }
     </style>
 
@@ -136,10 +160,15 @@
 <body>
     <div class="container">
         <h1>Topic: {{ topic.topic }}</h1>
-        <p><strong>ID:</strong> {{ topic.topic_id }}</p>
-        <p><strong>Creation Date:</strong> {{ topic.creation_date }}</p>
-        <p><strong>Edition Date:</strong> {{ topic.edition_date }}</p>
-        <p><strong>Data:</strong></p>
+        
+        <!-- Labels in a row -->
+        <div class="labels-row">
+            <p><strong>ID:</strong> {{ topic.topic_id }}</p>
+            <p><strong>Creation Date:</strong> {{ topic.creation_date }}</p>
+            <p><strong>Edition Date:</strong> {{ topic.edition_date }}</p>
+        </div>
+
+        <!-- Preformatted text without "Data" label -->
         <pre><code>{{ topic.data }}</code></pre>
 
         <h3>Uploaded Files:</h3>
