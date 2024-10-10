@@ -2,7 +2,7 @@ name: vconf
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "test" ]
     
 env:
   C2_NAME: 'vconf_ec2'
