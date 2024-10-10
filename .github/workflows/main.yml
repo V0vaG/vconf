@@ -75,11 +75,11 @@ jobs:
     - name: terraform destroy
       run: terraform destroy -auto-approve
       
-    # - name: terraform apply
-    #   run: terraform apply -auto-approve
+    - name: terraform apply
+      run: terraform apply -auto-approve
 
-    # - name: Get EC2 Instance ID and Public IP
-    #   run: |
-    #     INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${{ env.EC2_NAME }}" | jq -r '.Reservations[].Instances[].InstanceId') && \
-    #     PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[*].Instances[*].PublicIpAddress' --output text) && \
-    #     echo "Public IP: http://$PUBLIC_IP"
+    - name: Get EC2 Instance ID and Public IP
+      run: |
+        INSTANCE_ID=$(aws ec2 describe-instances --filters "Name=tag:Name,Values=${{ env.EC2_NAME }}" | jq -r '.Reservations[].Instances[].InstanceId') && \
+        PUBLIC_IP=$(aws ec2 describe-instances --instance-ids $INSTANCE_ID --query 'Reservations[*].Instances[*].PublicIpAddress' --output text) && \
+        echo "Public IP: http://$PUBLIC_IP"
