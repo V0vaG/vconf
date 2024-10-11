@@ -18,7 +18,7 @@ app.secret_key = 'supersecretkey'
 
 # Set up paths to align with the Bash script structure
 alias = "v-conf"  # Set this to match the alias used in the Bash script
-HOME_DIR = os.path.expanduser("/home/ubuntu/")
+HOME_DIR = os.path.expanduser("~")
 FILES_PATH = os.path.join(HOME_DIR, "script_files", alias)
 DATA_DIR = os.path.join(FILES_PATH, "data")
 

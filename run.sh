@@ -38,8 +38,8 @@ services:
         command: gunicorn -w 4 -b 0.0.0.0:5000 wsgi:app
         volumes:
             - /home/ubuntu/json/:/~/json
-            - /home/ubuntu/logs/:/~/logs1
-            - /root/script_files/v-conf:/~/v-conf
+            - /home/ubuntu/logs/:/~/logs
+            - /home/ubuntu/v-conf:/~/script_files/v-conf
     nginx:
         container_name: nginx
         restart: always
