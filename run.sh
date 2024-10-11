@@ -39,7 +39,7 @@ services:
         volumes:
             - /home/ubuntu/json/:/~/json
             - /home/ubuntu/logs/:/~/logs
-            - /home/ubuntu/data/:/~/data
+            - /home/ubuntu/script_files/v-conf/:/~/script_files/v-conf
             - /home/ubuntu/static/:/~/static
     nginx:
         container_name: nginx
