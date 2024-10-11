@@ -39,7 +39,7 @@ services:
         volumes:
             - /home/ubuntu/json/:/~/json
             - /home/ubuntu/logs/:/~/logs
-            - /home/ubuntu/v-conf:/~/script_files/v-conf
+            - /home/ubuntu/v-conf:/root/script_files/v-conf
     nginx:
         container_name: nginx
         restart: always
