@@ -56,7 +56,7 @@
         }
 
         /* Button Styles */
-        .button, .upload-button {
+        .button, .files-button {
             padding: 12px 25px;
             background-color: #4CAF50;
             color: white;
@@ -67,7 +67,7 @@
             margin-right: 10px;
         }
 
-        .button:hover, .upload-button:hover {
+        .button:hover, .files-button:hover {
             background-color: #45a049;
         }
 
@@ -94,11 +94,6 @@
             flex-shrink: 0; /* Make sure the button group doesn't shrink */
         }
 
-        /* Hidden File Input */
-        .custom-upload-button {
-            display: none;
-        }
-
         /* Responsive Design */
         @media (max-width: 768px) {
             .container {
@@ -118,28 +113,20 @@
 </head>
 <body>
     <div class="container">
-        <form id="edit-topic-form" action="{{ url_for('edit_topic', file=file, id=topic['topic_id']) }}" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: column; height: 100%;">
+        <form id="edit-topic-form" action="{{ url_for('edit_topic', folder=folder, id=topic['topic_id']) }}" method="POST" style="display: flex; flex-direction: column; height: 100%;">
             <label for="topic">Topic Name:</label>
             <input type="text" id="topic" name="topic" value="{{ topic['topic'] }}" required>
 
             <label for="data" style="margin-top: 10px;">Topic Data (Markdown):</label>
-            <textarea id="data" name="data" required>{{ topic['data'] }}</textarea>
+            <textarea id="data" name="data" required>{{ topic_content }}</textarea>
 
-            <!-- Save, Cancel, and Upload Buttons -->
+            <!-- Save, Cancel, and Files Buttons -->
             <div class="button-group">
                 <button type="submit" class="button">Save Changes</button>
-                <a href="{{ url_for('list_topics') }}" class="cancel-button">Cancel</a>
-                <label id="upload-label" for="files" class="upload-button">Upload Files</label>
+                <a href="{{ url_for('show_topic', folder=folder, id=topic['topic_id']) }}" class="cancel-button">Cancel</a>
+                <a href="{{ url_for('manage_files', folder=folder, id=topic['topic_id']) }}" class="files-button">Files</a>
             </div>
-            <input type="file" id="files" name="files" class="custom-upload-button" multiple>
         </form>
     </div>
-
-    <script>
-        // Trigger file input when the custom upload button is clicked
-        document.getElementById('upload-label').addEventListener('click', function() {
-            document.getElementById('files').click();
-        });
-    </script>
 </body>
 </html>

@@ -24,7 +24,7 @@
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
         }
 
         /* Heading style */
@@ -35,29 +35,70 @@
             text-align: center;
         }
 
-        /* List styling */
-        ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
 
-        li {
-            margin-bottom: 15px;
-            font-size: 1rem;
-            color: #555;
+        th, td {
+            text-align: left;
+            padding: 12px 15px;
+            border-bottom: 1px solid #ddd;
         }
 
-        a {
-            color: #4CAF50;
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        /* Making entire row clickable */
+        .clickable-row {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .clickable-row:hover {
+            background-color: #e9f5e9;
+        }
+
+        /* Link styling for the whole row */
+        .clickable-row a {
+            display: block;
+            color: inherit;
             text-decoration: none;
+            width: 100%;
+            height: 100%;
         }
 
-        a:hover {
-            text-decoration: underline;
+        /* Button styling for delete */
+        .delete-button {
+            padding: 8px 15px;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
-        /* Button styling */
+        .delete-button:hover {
+            background-color: #e53935;
+            transform: translateY(-2px);
+        }
+
+        .delete-button:active {
+            background-color: #d32f2f;
+            transform: translateY(0);
+        }
+
+        /* Back to home button styling */
         .nav-button {
             padding: 12px 25px;
             background-color: #4CAF50;
@@ -67,7 +108,6 @@
             font-size: 1.1rem;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
-            margin-top: 20px;
             display: inline-block;
             text-decoration: none;
             text-align: center;
@@ -88,15 +128,30 @@
     <div class="container">
         <h1>Search Results for "{{ search_term }}"</h1>
 
-        <ul>
-            {% for topic in topics %}
-            <li>
-                <a href="{{ url_for('show_topic', file=topic.file, id=topic.id) }}">
-                    {{ topic.id }}: {{ topic.name }} (from file: {{ topic.file }})
-                </a>
-            </li>
-            {% endfor %}
-        </ul>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Topic Name</th>
+                    <th>Number of Files</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for topic in topics %}
+                <tr class="clickable-row">
+                    <td><a href="{{ url_for('show_topic', folder=topic.folder, id=topic.id) }}">{{ topic.id }}</a></td>
+                    <td><a href="{{ url_for('show_topic', folder=topic.folder, id=topic.id) }}">{{ topic.name }}</a></td>
+                    <td>{{ topic.file_count }} files</td> <!-- Display the number of files -->
+                    <td>
+                        <form action="{{ url_for('delete_topic', folder=topic.folder, id=topic.id) }}" method="POST">
+                            <button type="submit" class="delete-button">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
         <a href="{{ url_for('home') }}" class="nav-button">Back to Home</a>
     </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Results</title>
+    <title>Topic List</title>
     <style>
         /* General reset and layout */
         body {
@@ -126,25 +126,25 @@
 </head>
 <body>
     <div class="container">
-        <h1>Search Results for "{{ search_term }}"</h1>
+        <h1>Topic List</h1>
 
         <table>
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Topic Name</th>
-                    <th>File</th>
+                    <th>Number of Files</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 {% for topic in topics %}
                 <tr class="clickable-row">
-                    <td><a href="{{ url_for('show_topic', file=topic.file, id=topic.id) }}">{{ topic.id }}</a></td>
-                    <td><a href="{{ url_for('show_topic', file=topic.file, id=topic.id) }}">{{ topic.name }}</a></td>
-                    <td><a href="{{ url_for('show_topic', file=topic.file, id=topic.id) }}">{{ topic.file }}</a></td>
+                    <td><a href="{{ url_for('show_topic', folder=topic.folder, id=topic.topic_id) }}">{{ topic.topic_id }}</a></td>
+                    <td><a href="{{ url_for('show_topic', folder=topic.folder, id=topic.topic_id) }}">{{ topic.topic }}</a></td>
+                    <td>{{ topic.file_count }} files</td> <!-- Display the number of files -->
                     <td>
-                        <form action="{{ url_for('delete_topic', file=topic.file, id=topic.id) }}" method="POST">
+                        <form action="{{ url_for('delete_topic', folder=topic.folder, id=topic.topic_id) }}" method="POST">
                             <button type="submit" class="delete-button">Remove</button>
                         </form>
                     </td>

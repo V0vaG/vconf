@@ -1,203 +1,74 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import send_from_directory
 import os
 import json
 from datetime import datetime
-import socket
-
 from werkzeug.utils import secure_filename
 
-build_num = os.getenv('B_NUM')
-host = socket.gethostname()
-
-if not build_num:
-    build_num = '0.0.0'
+version='0.0.0'
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
 
-# Directory for storing configuration and data in the same directory as the script
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Directory for storing uploaded files
-FILES_DIR = os.path.join(SCRIPT_DIR, 'static', 'files')
-os.makedirs(FILES_DIR, exist_ok=True)
-
-# Set FILES_PATH and DATA_DIR in the same directory as the Python script
-DATA_DIR = os.path.join(SCRIPT_DIR, "data")
+# Set up paths to align with the Bash script structure
+alias = "v-conf"  # Set this to match the alias used in the Bash script
+HOME_DIR = os.path.expanduser("~")
+FILES_PATH = os.path.join(HOME_DIR, "script_files", alias)
+DATA_DIR = os.path.join(FILES_PATH, "data")
 
 # Ensure the directories exist
 os.makedirs(DATA_DIR, exist_ok=True)
 
 print(f"Data directory: {DATA_DIR}")
 
-print(DATA_DIR)
-
-
-# Helper function to generate topic ID
-def generate_topic_id():
-    existing_ids = []
-    for file in os.listdir(DATA_DIR):
-        if file.endswith('.json'):
-            with open(os.path.join(DATA_DIR, file), 'r') as f:
-                data = json.load(f)
-                existing_ids.extend([int(topic["topic_id"]) for topic in data])
-
-    next_topic_id = 1
-    for topic_id in sorted(existing_ids):
-        if topic_id == next_topic_id:
-            next_topic_id += 1
-        else:
-            break
-    return f"{next_topic_id:05d}"
-
-
-# Route for home page
-@app.route('/')
-def home():
-    return render_template('index.html', host = host, version = build_num)
-
-
-# Route to list all topics (with clickable links)
-@app.route('/list')
-def list_topics():
-    all_topics = []
-    for file in os.listdir(DATA_DIR):
-        if file.endswith('.json'):
-            with open(os.path.join(DATA_DIR, file), 'r') as f:
-                data = json.load(f)
-                for topic in data:
-                    topic_id = topic.get("topic_id", "Unknown ID")
-                    creation_date = topic.get("creation_date", "Unknown Date")
-                    edition_date = topic.get("edition_date", "Never Edited")
-                    topic_name = topic.get("topic", "Unnamed Topic")
-                    all_topics.append(
-                        {'id': topic_id, 'date': creation_date, 'edit_date': edition_date, 'name': topic_name,
-                         'file': file})
-
-    all_topics.sort(key=lambda x: x['name'].lower())
-    return render_template('list.html', topics=all_topics)
-
-
-# Route to display the content of a selected topic
-@app.route('/topic/<file>/<id>')
-def show_topic(file, id):
-    file_path = os.path.join(DATA_DIR, file)
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as f:
-            data = json.load(f)
-            for topic in data:
-                if topic["topic_id"] == id:
-                    topic_files_dir = os.path.join(FILES_DIR, id)
-                    files = os.listdir(topic_files_dir) if os.path.exists(topic_files_dir) else []
-                    return render_template('topic.html', topic=topic, file=file, files=files)
-
-    flash(f"Topic with ID {id} not found.", "danger")
-    return redirect(url_for('list_topics'))
-
-
-# Route to edit a topic
-@app.route('/topic/<file>/<id>/edit', methods=['GET', 'POST'])
-def edit_topic(file, id):
-    file_path = os.path.join(DATA_DIR, file)
-    topic_files_dir = os.path.join(FILES_DIR, id)  # Directory for this topic's files
-    os.makedirs(topic_files_dir, exist_ok=True)
-
-    if request.method == 'POST':
-        updated_topic = request.form.get('topic')
-        updated_data = request.form.get('data')
-        edition_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")  # Store the edition date
-
-        # Handle file uploads
-        uploaded_files = request.files.getlist('files')
-        for uploaded_file in uploaded_files:
-            if uploaded_file.filename:
-                filename = secure_filename(uploaded_file.filename)
-                uploaded_file.save(os.path.join(topic_files_dir, filename))
-
-        # Update the topic in the JSON file
-        if os.path.exists(file_path):
-            with open(file_path, 'r') as f:
-                data = json.load(f)
-
-            for topic in data:
-                if topic["topic_id"] == id:
-                    topic["topic"] = updated_topic
-                    topic["data"] = updated_data
-                    topic["edition_date"] = edition_date  # Update the edition date
-
-            with open(file_path, 'w') as f:
-                json.dump(data, f, indent=4)
-
-            flash(f"Topic with ID {id} has been updated. Files uploaded successfully.", "success")
-            return redirect(url_for('show_topic', file=file, id=id))
-
-    # Preload the topic for the GET request
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as f:
-            data = json.load(f)
-            for topic in data:
-                if topic["topic_id"] == id:
-                    # List all files uploaded for this topic
-                    files = os.listdir(topic_files_dir)
-                    return render_template('edit.html', topic=topic, file=file, files=files)
-
-    flash(f"Topic with ID {id} not found.", "danger")
-    return redirect(url_for('list_topics'))
-
-
-# Route to create a new topic
-@app.route('/create', methods=['GET', 'POST'])
-def create_topic():
-    if request.method == 'POST':
-        file_name = request.form.get('file_name', 'data')
-        new_topic = request.form.get('new_topic')
-        new_data = request.form.get('new_data')
-
-        full_path = os.path.join(DATA_DIR, f"{file_name}.json")
-
-        if not os.path.exists(full_path):
-            with open(full_path, 'w') as f:
-                json.dump([], f)
-
-        topic_id = generate_topic_id()
-        creation_date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-        new_entry = {
-            "topic_id": topic_id,
-            "creation_date": creation_date,
-            "edition_date": "Never Edited",
-            "topic": new_topic,
-            "data": new_data
-        }
-
-        with open(full_path, 'r') as f:
-            data = json.load(f)
-
-        data.append(new_entry)
-        with open(full_path, 'w') as f:
-            json.dump(data, f, indent=4)
-
-        flash(f"New topic '{new_topic}' added successfully!", "success")
-        return redirect(url_for('list_topics'))
-
-    return render_template('create.html')
-
-
-# Route to search and edit a topic
+# Route to search for topics
 @app.route('/search', methods=['GET', 'POST'])
 def search_topic():
     if request.method == 'POST':
         search_term = request.form.get('search_term')
         found_topics = []
 
-        # Search by keyword
-        for file in os.listdir(DATA_DIR):
-            if file.endswith('.json'):
-                with open(os.path.join(DATA_DIR, file), 'r') as f:
-                    data = json.load(f)
-                    for topic in data:
-                        if search_term.lower() in topic["topic"].lower():
-                            found_topics.append({'id': topic["topic_id"], 'name': topic["topic"], 'file': file})
+        # Search by keyword in all JSON files
+        for folder in os.listdir(DATA_DIR):
+            if os.path.isdir(os.path.join(DATA_DIR, folder)) and folder.isdigit():
+                json_file = os.path.join(DATA_DIR, folder, f"{folder}.json")
+                if os.path.exists(json_file):
+                    with open(json_file, 'r') as f:
+                        data = json.load(f)
+                        for topic in data:
+                            if search_term.lower() in topic["topic"].lower():
+                                # Get the number of files in the 'files' folder
+                                files_dir = os.path.join(DATA_DIR, folder, "files")
+                                file_count = len(os.listdir(files_dir)) if os.path.exists(files_dir) else 0
+                                
+                                found_topics.append({
+                                    'id': topic["topic_id"],
+                                    'name': topic["topic"],
+                                    'folder': folder,
+                                    'file_count': file_count  # Pass the file count
+                                })
+
+        if not found_topics:
+            flash("No topics found with that term.", "danger")
+        
+        return render_template('search_results.html', topics=found_topics, search_term=search_term)
+
+    return render_template('search.html')
+
+    if request.method == 'POST':
+        search_term = request.form.get('search_term')
+        found_topics = []
+
+        # Search by keyword in all JSON files
+        for folder in os.listdir(DATA_DIR):
+            if os.path.isdir(os.path.join(DATA_DIR, folder)) and folder.isdigit():
+                json_file = os.path.join(DATA_DIR, folder, f"{folder}.json")
+                if os.path.exists(json_file):
+                    with open(json_file, 'r') as f:
+                        data = json.load(f)
+                        for topic in data:
+                            if search_term.lower() in topic["topic"].lower():
+                                found_topics.append({'id': topic["topic_id"], 'name': topic["topic"], 'folder': folder})
 
         if not found_topics:
             flash("No topics found with that term.", "danger")
@@ -205,39 +76,261 @@ def search_topic():
 
     return render_template('search.html')
 
+@app.route('/files/<topic_id>/<filename>')
+def download_file(topic_id, filename):
+    folder_path = os.path.join(DATA_DIR, topic_id, "files")  # Path to the files folder
+    return send_from_directory(folder_path, filename, as_attachment=True)
+
+@app.route('/topic/<folder>/<id>/files', methods=['GET', 'POST'])
+def manage_files(folder, id):
+    topic_dir = os.path.join(DATA_DIR, folder)
+    
+    if not os.path.exists(topic_dir):
+        flash(f"Topic directory for ID {id} not found.", "danger")
+        return redirect(url_for('list_topics'))
+
+    files_dir = os.path.join(topic_dir, 'files')
+    if not os.path.exists(files_dir):
+        os.makedirs(files_dir)
+
+    # Fetch the list of files
+    files = []
+    for filename in os.listdir(files_dir):
+        filepath = os.path.join(files_dir, filename)
+        file_size = os.path.getsize(filepath) / 1024  # File size in KB
+        files.append({'name': filename, 'size': round(file_size, 2)})
+
+    # If it's a POST request, we assume the user is uploading files
+    if request.method == 'POST':
+        uploaded_files = request.files.getlist('files')
+        for uploaded_file in uploaded_files:
+            if uploaded_file.filename:
+                filename = secure_filename(uploaded_file.filename)
+                uploaded_file.save(os.path.join(files_dir, filename))
+
+        flash("Files uploaded successfully!", "success")
+        return redirect(url_for('manage_files', folder=folder, id=id))
+
+    # Load topic metadata (if needed)
+    json_file = os.path.join(topic_dir, f'{id}.json')
+    with open(json_file, 'r') as f:
+        topic = json.load(f)[0]
+
+    return render_template('files.html', files=files, topic=topic, folder=folder)
+
+# Load a topic's metadata and markdown content
+def load_topic(topic_id):
+    topic_dir = os.path.join(DATA_DIR, topic_id)
+    json_file = os.path.join(topic_dir, f"{topic_id}.json")
+    md_file = os.path.join(topic_dir, f"{topic_id}.md")
+
+    # Load JSON metadata
+    if os.path.exists(json_file):
+        with open(json_file, 'r') as f:
+            topic_data = json.load(f)
+
+    # Load markdown content from the .md file
+    if os.path.exists(md_file):
+        with open(md_file, 'r') as f:
+            topic_content = f.read()  # Read the markdown content
+
+    return topic_data, topic_content
+
+    topic_dir = os.path.join(DATA_DIR, topic_id)
+    json_file = os.path.join(topic_dir, f"{topic_id}.json")
+    md_file = os.path.join(topic_dir, f"{topic_id}.md")
+
+    topic_data, topic_content = None, None
+    if os.path.exists(json_file):
+        with open(json_file, 'r') as f:
+            topic_data = json.load(f)
+
+    if os.path.exists(md_file):
+        with open(md_file, 'r') as f:
+            topic_content = f.read()
+
+    return topic_data, topic_content
+
+# Save a topic's metadata and markdown content
+def save_topic(topic_id, topic_data, topic_content):
+    topic_dir = os.path.join(DATA_DIR, topic_id)
+    os.makedirs(topic_dir, exist_ok=True)
+
+    json_file = os.path.join(topic_dir, f"{topic_id}.json")
+    md_file = os.path.join(topic_dir, f"{topic_id}.md")
+
+    with open(json_file, 'w') as f:
+        json.dump(topic_data, f, indent=4)
+
+    with open(md_file, 'w') as f:
+        f.write(topic_content)
+
+# Helper function to generate the next topic ID
+def generate_topic_id():
+    existing_ids = sorted([int(d) for d in os.listdir(DATA_DIR) if d.isdigit()])
+
+    next_topic_id = 1  # Start checking from ID 1
+
+    for topic_id in existing_ids:
+        if topic_id == next_topic_id:
+            next_topic_id += 1  # Move to the next ID if current one exists
+        else:
+            break  # We found a gap, so break the loop and return this ID
+
+    return str(next_topic_id)
+
+# Route for home page
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+# Route to list all topics
+@app.route('/list')
+def list_topics():
+    all_topics = []
+    for folder in os.listdir(DATA_DIR):
+        folder_path = os.path.join(DATA_DIR, folder)
+        if os.path.isdir(folder_path):
+            json_file = os.path.join(folder_path, f"{folder}.json")
+            if os.path.exists(json_file):
+                with open(json_file, 'r') as f:
+                    data = json.load(f)
+                    topic = data[0]  # Assuming the first topic is the main one
+                    files_dir = os.path.join(folder_path, "files")
+                    file_count = len(os.listdir(files_dir)) if os.path.exists(files_dir) else 0
+                    topic['file_count'] = file_count  # Add file count to the topic
+                    topic['folder'] = folder  # Make sure this is added when building the topic dictionary
+                    all_topics.append(topic)
+
+    return render_template('list.html', topics=all_topics)
+
+# Route to display a topic
+@app.route('/topic/<folder>/<id>')
+def show_topic(folder, id):
+    topic_dir = os.path.join(DATA_DIR, folder)
+    json_file = os.path.join(topic_dir, f"{id}.json")
+    md_file = os.path.join(topic_dir, f"{id}.md")
+    files_dir = os.path.join(topic_dir, "files")
+
+    topic = None  # Initialize topic variable
+    topic_content = "No content available"  # Default content if markdown file is missing
+
+    # Load topic metadata from the .json file
+    if os.path.exists(json_file):
+        with open(json_file, 'r') as f:
+            try:
+                data = json.load(f)
+                topic = data[0]  # Assuming the topic is the first entry in the JSON file
+            except json.JSONDecodeError:
+                flash("Error decoding JSON data for this topic.", "danger")
+                return redirect(url_for('list_topics'))
+    else:
+        flash("Topic metadata not found.", "danger")
+        return redirect(url_for('list_topics'))
+
+    # Load markdown content from the .md file if it exists
+    if os.path.exists(md_file):
+        with open(md_file, 'r') as f:
+            topic_content = f.read()
+
+    # Check if the "files" directory exists
+    if os.path.exists(files_dir):
+        files = os.listdir(files_dir)
+    else:
+        files = []
+
+    # Pass the topic data and markdown content to the template
+    return render_template('topic.html', topic=topic, files=files, topic_content=topic_content, folder=folder)
+
+# Route to edit a topic
+@app.route('/topic/<folder>/<id>/edit', methods=['GET', 'POST'])
+def edit_topic(folder, id):
+    topic_dir = os.path.join(DATA_DIR, folder)
+    json_file = os.path.join(topic_dir, f"{id}.json")
+    md_file = os.path.join(topic_dir, f"{id}.md")
+
+    # Load the topic metadata
+    if os.path.exists(json_file):
+        with open(json_file, 'r') as f:
+            topic = json.load(f)[0]
+    else:
+        flash("Topic not found.", "danger")
+        return redirect(url_for('list_topics'))
+
+    # Load markdown content
+    if os.path.exists(md_file):
+        with open(md_file, 'r') as f:
+            topic_content = f.read()
+    else:
+        topic_content = ""
+
+    if request.method == 'POST':
+        # Update the topic content
+        updated_content = request.form['data']
+
+        # Save the updated content to the markdown file
+        with open(md_file, 'w') as f:
+            f.write(updated_content)
+
+        # Optionally update the JSON metadata if needed (e.g., update the edition date)
+        topic['edition_date'] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(json_file, 'w') as f:
+            json.dump([topic], f, indent=4)
+
+        flash("Topic updated successfully.", "success")
+        return redirect(url_for('show_topic', folder=folder, id=id))
+
+    return render_template('edit.html', topic=topic, topic_content=topic_content, folder=folder)
+
+# Route to create a new topic
+@app.route('/create', methods=['GET', 'POST'])
+def create_topic():
+    if request.method == 'POST':
+        new_topic = request.form.get('new_topic')
+        new_content = request.form.get('new_data')
+
+        topic_id = generate_topic_id()
+        topic_dir = os.path.join(DATA_DIR, topic_id)
+        os.makedirs(topic_dir, exist_ok=True)
+
+        creation_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        new_entry = [{
+            "topic_id": topic_id,
+            "topic": new_topic,
+            "creation_date": creation_date,
+            "edition_date": creation_date,
+            "editor": "user",  # Adjust this as needed
+            "data_file": os.path.join(topic_dir, f"{topic_id}.md"),
+            "files": os.path.join(topic_dir, "files")
+        }]
+
+        save_topic(topic_id, new_entry, new_content)
+        flash(f"New topic '{new_topic}' added successfully!", "success")
+        return redirect(url_for('list_topics'))
+
+    return render_template('create.html')
 
 # Route to delete a topic
-@app.route('/delete/<file>/<id>', methods=['POST'])
-def delete_topic(file, id):
-    file_path = os.path.join(DATA_DIR, file)
-
-    if os.path.exists(file_path):
-        with open(file_path, 'r') as f:
-            data = json.load(f)
-
-        # Filter out the topic with the matching ID
-        data = [topic for topic in data if topic["topic_id"] != id]
-
-        with open(file_path, 'w') as f:
-            json.dump(data, f, indent=4)
-
+@app.route('/delete/<folder>/<id>', methods=['POST'])
+def delete_topic(folder, id):
+    topic_dir = os.path.join(DATA_DIR, folder)
+    if os.path.exists(topic_dir):
+        os.system(f'rm -r {topic_dir}')
         flash(f"Topic with ID {id} has been deleted.", "success")
     else:
-        flash(f"File not found: {file}", "danger")
-
+        flash(f"Topic with ID {id} not found.", "danger")
     return redirect(url_for('list_topics'))
 
-@app.route('/delete_file/<topic_id>/<filename>', methods=['POST'])
-def delete_file(topic_id, filename):
-    file_path = os.path.join(FILES_DIR, topic_id, filename)
+# Route to delete a file
+@app.route('/delete_file/<folder>/<filename>', methods=['POST'])
+def delete_file(folder, filename):
+    file_path = os.path.join(DATA_DIR, folder, "files", filename)
     if os.path.exists(file_path):
         os.remove(file_path)
         flash(f"File '{filename}' has been deleted.", "success")
     else:
         flash(f"File '{filename}' not found.", "danger")
-    return redirect(url_for('edit_topic', file='data.json', id=topic_id))  # Adjust based on your data file
-
-
+    return redirect(url_for('edit_topic', folder=folder, id=folder))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -169,20 +169,24 @@
         </div>
 
         <!-- Preformatted text without "Data" label -->
-        <pre><code>{{ topic.data }}</code></pre>
+        <pre><code>{{ topic_content | safe }}</code></pre>
 
         <h3>Uploaded Files:</h3>
         <ul>
-            {% for file in files %}
-                <li>
-                    <a href="{{ url_for('static', filename='files/' + topic.topic_id + '/' + file) }}" class="file-link">{{ file }}</a>
-                </li>
-            {% endfor %}
+            {% if files %}
+                {% for file in files %}
+                    <li>
+                        <a href="{{ url_for('download_file', topic_id=topic.topic_id, filename=file) }}" class="file-link">{{ file }}</a>
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li>No files uploaded</li>
+            {% endif %}
         </ul>
 
         <div class="button-container">
             <a href="{{ url_for('list_topics') }}" class="button cancel-button">Back to List</a>
-            <a href="{{ url_for('edit_topic', file=file, id=topic.topic_id) }}" class="button">Edit</a>
+            <a href="{{ url_for('edit_topic', folder=folder, id=topic.topic_id) }}" class="button">Edit</a>
         </div>
     </div>
 </body>
