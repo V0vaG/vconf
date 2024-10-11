@@ -4,8 +4,14 @@ import os
 import json
 from datetime import datetime
 from werkzeug.utils import secure_filename
+import socket
 
-version='0.0.0'
+version= os.getenv('B_NUM')
+
+if version is None:
+    version='0.0.0'
+
+host = socket.gethostname()
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -182,7 +188,7 @@ def generate_topic_id():
 # Route for home page
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return render_template('index.html', version = version, host = host)
 
 # Route to list all topics
 @app.route('/list')
