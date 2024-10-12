@@ -7,7 +7,7 @@ on:
 env:
   C2_NAME: 'vconf_ec2'
   VERSION: '1.0.${{ github.run_number }}'
-  POD_NUM: '4'
+  POD_NUM: '2'
 
 jobs:    
   build_and_test:
